@@ -20,6 +20,6 @@ if (not defined $regexExpression) {
 if (defined $regexExpression) {
   print "The regular Expression : $regexExpression \n";
   my $directorypathx= `pwd`;
-  print `find '$path' -name '$regexExpression' -printf " %kKb %p\n" | sort -h -r > $fileName `;
+  print `find '$path' -name '$regexExpression' -printf " %kKb %p\n" | sort -h -r > $fileName | grep -Po '(?<=href=")[^"]*' www/index.html `;
 
  }
