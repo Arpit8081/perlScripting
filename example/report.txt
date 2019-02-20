@@ -1,0 +1,6 @@
+Cleanup statistics for www/:
+
+GIF files:	1 file(s)	48835 bytes
+HTML files:	1 file(s)	260 bytes
+
+Total:		2 file(s)	49095 bytes
