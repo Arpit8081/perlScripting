@@ -20,6 +20,9 @@ if (not defined $regexExpression) {
 if (defined $regexExpression) {
   print "The regular Expression : $regexExpression \n";
   my $directorypathx= `pwd`;
-  print `find '$path' -name '$regexExpression' -printf " %kKb %p\n" | sort -h -r > $fileName `;
+  my $files ="";
+   $files=`find '$path' -name '$regexExpression' | sort -h -r ` ; 
+   print "find is running correctly ";
+   print $files;
 
  }
