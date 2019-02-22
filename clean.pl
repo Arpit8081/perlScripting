@@ -20,9 +20,14 @@ if (not defined $regexExpression) {
 if (defined $regexExpression) {
   print "The regular Expression : $regexExpression \n";
   my $directorypathx= `pwd`;
-  my $files ="";
-   $files=`find '$path' -name '$regexExpression' | sort -h -r ` ; 
-   print "find is running correctly ";
-   print $files;
+  my ($listofFileNames) = findFilesinDir($path);  # List of the files in a Directory.
+  print $listofFileNames; 
+ }
 
+# findFilesinDir :: -> A function that is used to find the  files in the directory and return the list of the array.
+ sub findFilesinDir{
+ 	print "inside subroutines";
+ 	my($path) = @_;
+ 	my $fileNames =`find '$path' -name '$regexExpression' | sort -h -r ` ;
+ 	return $fileNames; 
  }
