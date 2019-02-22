@@ -29,9 +29,9 @@ if (defined $regexExpression) {
 
 # findFilesinDir :: -> A function that is used to find the  files in the directory and return the list of the array.
  sub findFilesinDir{
- 	print "inside subroutines ", $path;
+ 	print "inside subroutines \n", $path;
  	my($pathName) = @_;
- 	my $fileNames =`find '$pathName' -name '$regexExpression' | sort -h -r ` ;
+ 	my $fileNames =`find '$pathName' -name '$regexExpression' | sort -h -r | grep -Po '(?<=href=")[^"]*' $path/*.html` ;
  	return $fileNames; 
  }
 
