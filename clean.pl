@@ -24,10 +24,16 @@ if (defined $regexExpression) {
   print $listofFileNames; 
  }
 
+# print `find '$path' -name '$regexExpression' -printf " %kKb %p\n" | grep -Po '(?<=href=")[^"]*' $path/*.html | sort -h -r > $fileName `;
+
+
 # findFilesinDir :: -> A function that is used to find the  files in the directory and return the list of the array.
  sub findFilesinDir{
- 	print "inside subroutines";
- 	my($path) = @_;
- 	my $fileNames =`find '$path' -name '$regexExpression' | sort -h -r ` ;
+ 	print "inside subroutines ", $path;
+ 	my($pathName) = @_;
+ 	my $fileNames =`find '$pathName' -name '$regexExpression' | sort -h -r ` ;
  	return $fileNames; 
  }
+
+ # run the program 
+ # perl clean.pl www
