@@ -22,6 +22,7 @@ if (defined $regexExpression) {
   my $directorypathx= `pwd`;
   my ($listofFileNames) = findFilesinDir($path);  # List of the files in a Directory.
   my ($listofLinks) = readallHrefInaFile();
+  my ($listofImage) = readImageFile();
   print $listofLinks; 
  }
 
@@ -29,7 +30,7 @@ if (defined $regexExpression) {
 
 
 # findFilesinDir :: -> A function that is used to find the  files in the directory and return the list of the array.
- sub findFilesinDir{
+sub findFilesinDir{
  	print "inside subroutines \n", $path;
  	print "inside subroutines ", $path,"\n";
  	my($pathName) = @_;
@@ -39,10 +40,14 @@ if (defined $regexExpression) {
 
 
 sub readallHrefInaFile{
-	#my ($currentFile) = '';
   my $getAllLinks = ` grep -Eo "<a .*href=.*>" $path*.html| uniq` ;
   print $getAllLinks ; 
-    #return $getAllLinks;
+}
+
+sub readImageFile{
+  print "image files \n";
+  my $getAllImage = ` grep -Eo "<img .*src=.*>" $path*.html | uniq `;
+  print $getAllImage;
 }
  # run the program 
  # perl clean.pl www
