@@ -21,9 +21,9 @@ if (defined $regexExpression) {
   print "The regular Expression : $regexExpression \n";
   my $directorypathx= `pwd`;
   my ($listofFileNames) = findFilesinDir($path);  # List of the files in a Directory.
-  my ($listofLinks) = readallHrefInaFile();
-  my ($listofImage) = readImageFile();
-  print $listofLinks; 
+ # my ($listofLinks) = readallHrefInaFile();
+  #my ($listofImage) = readImageFile();
+  print $listofFileNames; 
  }
 
 # print `find '$path' -name '$regexExpression' -printf " %kKb %p\n" | grep -Po '(?<=href=")[^"]*' $path/*.html | sort -h -r > $fileName `;
