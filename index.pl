@@ -2,7 +2,8 @@
     use strict;
     use warnings;
     use 5.18.0;
-    my $directory = scalar $ARGV[0];
+
+    my $directory = 'www';
     my @myNames = ();
     opendir (DIR, $directory) or die $!;
 
@@ -12,7 +13,7 @@
     	     say("DIR ++++++++  $directory"); 
     	     say("this is a  $file");
 
-    	     if($file =~ /\.[a-zA-Z]/){
+    	     if($file =~ /[a-zA-Z]$/){
     	     	print "inside loop \n";
     	     	push @myNames,$file
     	     }		 
@@ -31,4 +32,3 @@ my %hash = (one => "uno",two=> "dos",dir => [("3","4")]);
 while (my($k,$v)=each %hash){
 	say "$k  ->  $v";
 }
-
