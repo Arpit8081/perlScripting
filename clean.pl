@@ -35,17 +35,32 @@ if(not defined $directory){
    say(@onlyFiles);
    # only directory  
    my @subdiretory = grep{$_ !~ m/\.[a-zA-Z]/ } @filesndDir;
-   say(@subdiretory);
-   foreach (@subdiretory) {
-     my @file = customReadDirectory($_);
-     say("the say $_ , @file");
-     push @onlyFiles, @file;
+   say("sub dir is @subdiretory");
+   say("change \n");
+   # now iterating each subdirectory and  push into an subdiretory array .
+   my @data = repeatCustomReadDirectory(@subdiretory);
+   push @onlyFiles,@data;
+
+   foreach(@onlyFiles){
+    print " file are : $_\n";
    }
    #makeDir("t2.txt");
    # readFile("www/craters1.html"); # works fine src and href 
   readFile("www/index.html");
-  say("final @onlyFiles");
 
+}
+
+# repeat array tasks 
+sub repeatCustomReadDirectory{
+  my @dir = @_;
+  print (@dir);
+  my @onlyFiles =();
+  foreach my $file (@dir) {
+     my @file = customReadDirectory($file);
+     say("the file name is ====, @file");
+     push @onlyFiles, @file;
+   }
+  return @onlyFiles;
 }
 
 
@@ -63,7 +78,7 @@ sub readFile{
   # configure its behaviour
   while (my $token = $p->get_tag("img","a")) {
      my $currentlink = $token->[1]{href} || $token->[1]{src};
-     say($currentlink);
+     say("parsed links : $currentlink");
      push @links,$currentlink;
   }
   return @links;
