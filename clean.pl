@@ -16,7 +16,7 @@ sub customReadDirectory{
     while (my $file = readdir(DIR)) {
       next unless (-d "$directories");
            if($file =~ /[a-zA-Z]/){ 
-            print "inside loop $file \n";
+           # print "inside loop $file \n";
             push @listofFiles,"$directories/$file"
            }     
     }
@@ -29,39 +29,36 @@ if(not defined $directory){
   die("## Error - Directory not defined, add the directory and re-run the script.");
 } else{
    my @filesndDir = customReadDirectory($directory); # contains the direcory and files 
-   say("at files ",@filesndDir);
    # onlyFiles - all the files removing directories .
    my @onlyFiles = grep{$_ =~ m/\.[a-zA-Z]/ } @filesndDir ;  
-   say(@onlyFiles);
-   # only directory  
+   say("The files are (@onlyFiles)");
+   # only directories that is downloads and Images.  
    my @subdiretory = grep{$_ !~ m/\.[a-zA-Z]/ } @filesndDir;
-   say("sub dir is @subdiretory");
-   say("change \n");
+   say("The sub directory  are (@subdiretory)");
    # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
    push @onlyFiles,@data;
-
-   foreach(@onlyFiles){
+    foreach(@onlyFiles){
     print " file are : $_\n";
    }
+
    #makeDir("t2.txt");
    # readFile("www/craters1.html"); # works fine src and href 
   readFile("www/index.html");
 
 }
 
-# repeat array tasks 
+# repeat array tasks for readDirectory
 sub repeatCustomReadDirectory{
   my @dir = @_;
-  print (@dir);
   my @onlyFiles =();
   foreach my $file (@dir) {
      my @file = customReadDirectory($file);
-     say("the file name is ====, @file");
      push @onlyFiles, @file;
    }
   return @onlyFiles;
 }
+
 
 
 # creation of directory 
