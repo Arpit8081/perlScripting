@@ -10,14 +10,14 @@ my $indexFIle = "www/index.html";
 sub customReadDirectory{
 
    my @listofFiles = ();
-
+   my $directories = $_[0];
    # openDir = > open the directory
-   opendir (DIR, $directory) or die $!;
+   opendir (DIR, $directories) or die $!;
     while (my $file = readdir(DIR)) {
-      next unless (-d "$directory");
+      next unless (-d "$directories");
            if($file =~ /[a-zA-Z]/){ 
-            print "inside loop \n";
-            push @listofFiles,$file
+            print "inside loop $file \n";
+            push @listofFiles,"$directories/$file"
            }     
     }
 
@@ -36,24 +36,28 @@ if(not defined $directory){
    # only directory  
    my @subdiretory = grep{$_ !~ m/\.[a-zA-Z]/ } @filesndDir;
    say(@subdiretory);
-
+   foreach (@subdiretory) {
+     my @file = customReadDirectory($_);
+     say("the say $_ , @file");
+     push @onlyFiles, @file;
+   }
    #makeDir("t2.txt");
-  # readFile("www/craters1.html"); # works fine src and href 
+   # readFile("www/craters1.html"); # works fine src and href 
   readFile("www/index.html");
+  say("final @onlyFiles");
 
 }
 
 
 # creation of directory 
 sub makeDir{
-  my ($argv)= @_; # taking   input #test 
+  my ($argv)= $_; # taking   input #test 
    return `mkdir $argv`;
 }
 
 # readFile function that reads and returns src and href in an array
 sub readFile{
-  my $somefile = @_[0];
-  say("ssssssssssss $somefile");
+  my $somefile = $_[0];
   my @links = ();
   my $p = HTML::TokeParser->new($somefile) || die "Can't open: $!";
   # configure its behaviour
