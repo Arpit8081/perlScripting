@@ -4,7 +4,7 @@ use 5.18.0;
 use HTML::TokeParser;
 
 my $directory = $ARGV[0];
-my $indexFIle = "www/index.html";
+#my @indexFIle = "www/index.html";
 
 # customReadDirectory {name of the directory} => or return the list of the files . 
 sub customReadDirectory{
@@ -37,14 +37,18 @@ if(not defined $directory){
    say("The sub directory  are (@subdiretory)");
    # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
+    # I have to create function like repeatCustomReadDirectory only for files.
+   my @rdata = repeatReadFile(@onlyFiles);
+   say ("only files are (@rdata)");
    push @onlyFiles,@data;
     foreach(@onlyFiles){
     print " file are : $_\n";
    }
 
    #makeDir("t2.txt");
-   # readFile("www/craters1.html"); # works fine src and href 
+  #readFile("www/craters1.html"); # works fine src and href 
   readFile("www/index.html");
+  readFile("@rdata");
 
 }
 
@@ -59,8 +63,16 @@ sub repeatCustomReadDirectory{
   return @onlyFiles;
 }
 
-
-
+#repeat array tasks for readFiles
+sub repeatReadFile{
+  my @filedir = @_;
+  my @subdir =();
+  foreach my $hfile (@filedir){
+    my @hfile = grep(/\.html$/,$hfile);
+    push @subdir, @hfile;
+  }
+  return @subdir;
+}
 # creation of directory 
 sub makeDir{
   my ($argv)= $_; # taking   input #test 
