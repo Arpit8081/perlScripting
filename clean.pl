@@ -1,54 +1,113 @@
 use strict;
 use warnings;
+use 5.18.0;
+use HTML::TokeParser;
+use File::Copy;
 
-my($path,$regexExpression) = @ARGV;
-my $fileName = "data.txt";
+my $directory = $ARGV[0];
+#my @indexFIle = "www/index.html";
 
+# customReadDirectory {name of the directory} => or return the list of the files . 
+sub customReadDirectory{
 
-if(not defined $path){
-	die "File directory not given, please  try again \n"
+   my @listofFiles = ();
+   my $directories = $_[0];
+   # openDir = > open the directory
+   opendir (DIR, $directories) or die $!;
+    while (my $file = readdir(DIR)) {
+      next unless (-d "$directories");
+           if($file =~ /[a-zA-Z]/){ 
+           # print "inside loop $file \n";
+            push @listofFiles,"$directories/$file"
+           }     
+    }
+
+   closedir(DIR); # closing the direcotory 
+   return @listofFiles;
+}
+# directory not defined them error message printed . 
+if(not defined $directory){
+  die("## Error - Directory not defined, add the directory and re-run the script.");
+} else{
+   my @filesndDir = customReadDirectory($directory); # contains the direcory and files 
+   # onlyFiles - all the files removing directories .
+   my @onlyFiles = grep{$_ =~ m/\.[a-zA-Z]/ } @filesndDir ;  
+   say(" ^^^^^^^^^^ The files are (@onlyFiles)");
+   # only directories that is downloads and Images.  
+   my @subdiretory = grep{$_ !~ m/\.[a-zA-Z]/ } @filesndDir;
+   say("The sub directory  are (@subdiretory)");
+   # now iterating each subdirectory and  push into an subdiretory array .
+   my @data = repeatCustomReadDirectory(@subdiretory);
+    # I have to create function like repeatCustomReadDirectory only for files.
+   my @rdata = repeatReadFile(@onlyFiles);
+   say ("only files are",@rdata);
+   push @onlyFiles,@data;
+      foreach(@onlyFiles){
+    say (" file are : $_");
+   }
+
+   #makeDir("data.txt");
+  #readFile("www/craters1.html"); # works fine src and href 
+  #readFile("www/index.html");
+  #my @readData = readFile(@rdata, @data);
+  #say(@readData);
+
 }
 
-print "added file ";
-
-if (not defined $regexExpression) {
-  # if regular expression not added or with the script it automatically consider regular expression as *		
-  $regexExpression="*";
-  print "--Taking default Regular Expression. \n"
+# repeat array tasks for readDirectory
+sub repeatCustomReadDirectory{
+  my @dir = @_;
+  my @onlyFiles =();
+  foreach my $file (@dir) {
+     my @file = customReadDirectory($file);
+     push @onlyFiles, @file;
+   }
+  return @onlyFiles;
 }
 
-if (defined $regexExpression) {
-  print "The regular Expression : $regexExpression \n";
-  my $directorypathx= `pwd`;
-  my ($listofFileNames) = findFilesinDir($path);  # List of the files in a Directory.
- # my ($listofLinks) = readallHrefInaFile();
-  #my ($listofImage) = readImageFile();
-  print $listofFileNames; 
- }
-
-# print `find '$path' -name '$regexExpression' -printf " %kKb %p\n" | grep -Po '(?<=href=")[^"]*' $path/*.html | sort -h -r > $fileName `;
-
-
-# findFilesinDir :: -> A function that is used to find the  files in the directory and return the list of the array.
-sub findFilesinDir{
- 	print "inside subroutines \n", $path;
- 	print "inside subroutines ", $path,"\n";
- 	my($pathName) = @_;
- 	my $fileNames =`find '$pathName' -name '$regexExpression' | sort -h -r ` ;
- 	return $fileNames; 
- }
-
-
-sub readallHrefInaFile{
-  my $getAllLinks = ` grep -Eo "<a .*href=.*>" $path*.html| uniq` ;
-  print $getAllLinks ; 
+#repeat array tasks for readFiles
+sub repeatReadFile{
+  my @filedir = @_;
+  my @subdir =();
+  foreach my $hfile (@filedir){
+    my @hfile = readFile($hfile);
+    say("The current links for the files \n",@hfile);
+    push @subdir, @hfile;
+  }
+ 
+  return @subdir;
+}
+# creation of directory 
+sub makeDir{
+  my ($argv)= $_; # taking   input #test 
+   return `mkdir $argv`;
 }
 
-sub readImageFile{
-  print "image files \n";
-  my $getAllImage = ` grep -Eo "<img .*src=.*>" $path*.html | uniq `;
-  print $getAllImage;
+# readFile function that reads and returns src and href in an array
+sub readFile{
+  my $somefile = $_[0];
+  my @links = ();
+  my $p = HTML::TokeParser->new($somefile) || die "Can't open: $!";
+  # configure its behaviour
+  while (my $token = $p->get_tag("img","a")){
+     my $currentlink = $token->[1]{href} || $token->[1]{src};
+     my $finalLink= $directory."/".$currentlink ; 
+     say(" =================> parsed links : $finalLink for the file is $somefile <==================" );
+     push @links,$finalLink;
+  }
+  return @links;
 }
- # run the program 
- # perl clean.pl www
 
+sub moveFile{
+  my $fileName= $_[0];
+  my $directoryName= $_[1];
+  #say ("moveFile", $fileName,$directoryName);
+
+}
+
+ # copy("sourcefile","destinationfile") or die "Copy failed: $!";
+ # copy("Copy.pm",\*STDOUT);
+ # move("/dev1/sourcefile","/dev2/destinationfile");
+ # use File::Copy "cp";
+ # $n = FileHandle->new("/a/file","r");
+ # cp($n,"x");
