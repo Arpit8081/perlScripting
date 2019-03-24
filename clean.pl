@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use 5.18.0;
 use HTML::TokeParser;
+use File::Copy;
 
 my $directory = $ARGV[0];
 #my @indexFIle = "www/index.html";
@@ -45,10 +46,10 @@ if(not defined $directory){
     print " file are : $_\n";
    }
 
-   #makeDir("t2.txt");
+   #makeDir("data.txt");
   #readFile("www/craters1.html"); # works fine src and href 
-  readFile("www/index.html");
-  readFile(@rdata);
+  #readFile("www/index.html");
+  readFile(@rdata, @data);
 
 }
 
@@ -85,10 +86,19 @@ sub readFile{
   my @links = ();
   my $p = HTML::TokeParser->new($somefile) || die "Can't open: $!";
   # configure its behaviour
-  while (my $token = $p->get_tag("img","a")) {
+  while (my $token = $p->get_tag("img","a")){
      my $currentlink = $token->[1]{href} || $token->[1]{src};
+     say ("$somefile");
      say("parsed links : $currentlink");
      push @links,$currentlink;
   }
   return @links;
 }
+
+
+ # copy("sourcefile","destinationfile") or die "Copy failed: $!";
+ # copy("Copy.pm",\*STDOUT);
+ # move("/dev1/sourcefile","/dev2/destinationfile");
+ # use File::Copy "cp";
+ # $n = FileHandle->new("/a/file","r");
+ # cp($n,"x");
