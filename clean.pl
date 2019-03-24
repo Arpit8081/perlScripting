@@ -48,7 +48,7 @@ if(not defined $directory){
    #makeDir("t2.txt");
   #readFile("www/craters1.html"); # works fine src and href 
   readFile("www/index.html");
-  readFile("@rdata");
+  readFile(@rdata);
 
 }
 
