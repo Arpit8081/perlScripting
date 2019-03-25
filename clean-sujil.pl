@@ -40,11 +40,15 @@ if(not defined $directory){
    # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
     # I have to create function like repeatCustomReadDirectory only for files.
-   my @rdata = repeatReadFile(@onlyFiles);
-   say ("only files are ",@rdata);
+   my @rdata = readFile("www/index.html");
    push @onlyFiles,@data;
-      foreach(@onlyFiles){
-    say (" file are : $_");
+
+   foreach(@rdata){
+     say("used links in HTML Files need to kept as it is : $_");
+   }
+
+   foreach(@onlyFiles){
+    say (" total file in the current directory $directory: $_");
    }
 
    #makeDir("data.txt");
@@ -52,6 +56,14 @@ if(not defined $directory){
   #readFile("www/index.html");
   #my @readData = readFile(@rdata, @data);
   #say(@readData);1
+
+}
+
+sub getMissingFiles{
+  my @file=$_[0];
+  my @usedFiles= $_[1];
+  my @unusedFiles=();
+  # need to  write logic for unsed files by @files array and @rday array . 
 
 }
 
@@ -66,20 +78,7 @@ sub repeatCustomReadDirectory{
   return @onlyFiles;
 }
 
-#repeat array tasks for readFiles
-sub repeatReadFile{
-  my @filedir = @_;
-  my @subdir =();
-  foreach my $hfile (@filedir){
-    
-  }
-  while(my $hfile=shift(@filedir)){
-      my @hfiles = readFile($hfile);
-    say("The current links for the files \n",@hfiles);
-    push @subdir, @hfiles;
-  }
-  return @subdir;
-}
+
 # creation of directory 
 sub makeDir{
   my ($argv)= $_; # taking   input #test 
@@ -89,14 +88,20 @@ sub makeDir{
 # readFile function that reads and returns src and href in an array
 sub readFile{
   my $somefile = $_[0];
-  my @links = ();
+  my @links = ($somefile);
+  #say("=====!  readFileCalled ====!!", @links);
   my $p = HTML::TokeParser->new($somefile) || die "Can't open: $!";
   # configure its behaviour
   while (my $token = $p->get_tag("img","a")){
      my $currentlink = $token->[1]{href} || $token->[1]{src};
      my $finalLink= $directory."/".$currentlink ; 
-     say(" =================> parsed links : $finalLink for the file is $somefile <==================" );
-     push @links,$finalLink;
+     if($currentlink =~ /\.html$/){
+         #say("Reading the next html File is... ",$currentlink);
+         my @data = readFile($finalLink); # recursive Function that is called 
+         push @links,@data;
+     } else{
+          push @links,$finalLink;
+     }
   }
   return @links;
 }
