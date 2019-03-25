@@ -3,7 +3,7 @@ use warnings;
 use 5.18.0;
 use HTML::TokeParser;
 use File::Copy;
-
+use List::Compare;
 my $directory = $ARGV[0];
 #my @indexFIle = "www/index.html";
 
@@ -50,6 +50,10 @@ if(not defined $directory){
    foreach(@onlyFiles){
     say (" total file in the current directory $directory: $_");
    }
+   my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
+   foreach(@missingFiles){
+    say(" unused files: $_ ");
+   }
 
    #makeDir("data.txt");
   #readFile("www/craters1.html"); # works fine src and href 
@@ -60,11 +64,16 @@ if(not defined $directory){
 }
 
 sub getMissingFiles{
-  my @file=$_[0];
-  my @usedFiles= $_[1];
+  my (@files) =@_;
+  my $totalFiles = @files[0];
+  my $usedFiles = @files[1];
   my @unusedFiles=();
-  # need to  write logic for unsed files by @files array and @rday array . 
+  # need to  write logic for unsed files by @files array and @rdata array.
+ #say("files", @$totalFiles);
+ #say("usedArray",@$usedFiles); 
 
+  my $diff = List::Compare->new( $totalFiles, $usedFiles );
+  return $diff->get_Lonly;
 }
 
 # repeat array tasks for readDirectory
