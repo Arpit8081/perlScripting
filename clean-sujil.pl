@@ -40,26 +40,34 @@ if(not defined $directory){
    # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
     # I have to create function like repeatCustomReadDirectory only for files.
-   my @rdata = readFile("www/index.html");
+   my @rdata = readFile("www/index.html"); # need to change 
    push @onlyFiles,@data;
 
    foreach(@rdata){
+     # list of all used links from index.html 
      say("used links in HTML Files need to kept as it is : $_");
    }
 
    foreach(@onlyFiles){
+    # list of the all the files . 
     say (" total file in the current directory $directory: $_");
    }
    my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
    foreach(@missingFiles){
+    # unused links that needs to moved rubbish folder 
     say(" unused files: $_ ");
    }
 
    #makeDir("data.txt");
-  #readFile("www/craters1.html"); # works fine src and href 
-  #readFile("www/index.html");
-  #my @readData = readFile(@rdata, @data);
-  #say(@readData);1
+   #readFile("www/craters1.html"); # works fine src and href 
+   #readFile("www/index.html");
+   #my @readData = readFile(@rdata, @data);
+   #say(@readData);1
+
+   my $val = "img/yz" ;
+   my @fields = split '/', $val;
+
+   print @fields[1];
 
 }
 
