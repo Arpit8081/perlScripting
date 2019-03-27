@@ -2,8 +2,10 @@ use strict;
 use warnings;
 use 5.18.0;
 use HTML::TokeParser;
+use File::Basename;
+no warnings 'experimental::smartmatch';
 my $directory = $ARGV[0];
-#my @indexFIle = "www/index.html";
+my @indexFiles = "$directory/index.html";
 
 # customReadDirectory {name of the directory} => or return the list of the files . 
 sub customReadDirectory{
@@ -20,7 +22,7 @@ sub customReadDirectory{
            }     
     }
 
-   closedir(DIR); # closing the direcotory 
+   closedir(DIR); # closing the directory 
    return @listofFiles;
 }
 # directory not defined them error message printed . 
@@ -38,7 +40,7 @@ if(not defined $directory){
    # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
     # I have to create function like repeatCustomReadDirectory only for files.
-   my @rdata = readFile("www/index.html"); # need to change 
+   my @rdata = readFile("@indexFiles"); # need to change 
    push @onlyFiles,@data;
 
    foreach(@rdata){
@@ -64,22 +66,16 @@ if(not defined $directory){
    #readFile("www/index.html");
    #my @readData = readFile(@rdata, @data);
    #say(@readData);1
-
-   my $val = "img/yz" ;
-   my @fields = split '/', $val;
-
-   print @fields[1];
+   my $total= print `find '$directory'  -printf  "%sB %p\n" | du -ch $directory/* > report.txt `;
 
 }
 
 sub getMissingFiles{
   my (@files) =@_;
-  my $totalFiles = @files[0];
-  my $usedFiles = @files[1];
+  my $totalFiles = $files[0];
+  my $usedFiles = $files[1];
   my @unusedFiles=();
-  # need to  write logic for unsed files by @files array and @rdata array.
- #say("files \n", @$totalFiles);
- #say("usedArray \n",@$usedFiles); 
+  # write logic for unsed files by @files array and @rdata array.
  foreach(@$totalFiles)
 {
     my $key= $_;
@@ -114,14 +110,12 @@ sub makeDir{
 sub readFile{
   my $somefile = $_[0];
   my @links = ($somefile);
-  #say("=====!  readFileCalled ====!!", @links);
   my $p = HTML::TokeParser->new($somefile) || die "Can't open: $!";
   # configure its behaviour
   while (my $token = $p->get_tag("img","a")){
      my $currentlink = $token->[1]{href} || $token->[1]{src};
      my $finalLink= $directory."/".$currentlink ; 
      if($currentlink =~ /\.html$/){
-         #say("Reading the next html File is... ",$currentlink);
          my @data = readFile($finalLink); # recursive Function that is called 
          push @links,@data;
      } else{
@@ -137,10 +131,10 @@ sub moveFile{
   my $directoryName= $_[1];
    foreach my $path ($fileName,$directoryName){
     # unused links that needs to moved rubbish folder 
-    (my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
-    say(" unused files in movfile: $path -> $basename");
-    my $b = `cp $basename  ./RubbishBin/`; #If I used `cp $directory/$basename  ./RubishBin`. Then only craters2.html move.
-   }
+    #(my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
+    #say(" unused files in movfile: $path -> $basename");
+    my $b = `cp -r $path  ./RubbishBin/`; #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
+  }
 
   #say ("moveFile", $fileName,$directoryName);
 
