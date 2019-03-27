@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use 5.18.0;
 use HTML::TokeParser;
-#use List::Compare;
 my $directory = $ARGV[0];
 #my @indexFIle = "www/index.html";
 
@@ -52,10 +51,9 @@ if(not defined $directory){
     say (" total file in the current directory $directory: $_");
    }
    my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
-   foreach my $path (@missingFiles){
+   foreach (@missingFiles){
     # unused links that needs to moved rubbish folder 
-    (my $basename = $path) =~ s,.*/,,;
-    say(" unused files: $path -> $basename");
+    say(" unused files: $_");
    }
 
    my @create= makeDir(@missingFiles);
@@ -139,9 +137,9 @@ sub moveFile{
   my $directoryName= $_[1];
    foreach my $path ($fileName,$directoryName){
     # unused links that needs to moved rubbish folder 
-    (my $basename = $path) =~ s,.*/,,;
+    (my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
     say(" unused files in movfile: $path -> $basename");
-    my $b = `cp $basename  ./RubbishBin/`;
+    my $b = `cp $basename  ./RubbishBin/`; #If I used `cp $directory/$basename  ./RubishBin`. Then only craters2.html move.
    }
 
   #say ("moveFile", $fileName,$directoryName);
