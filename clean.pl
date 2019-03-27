@@ -2,8 +2,7 @@ use strict;
 use warnings;
 use 5.18.0;
 use HTML::TokeParser;
-use File::Copy;
-
+#use List::Compare;
 my $directory = $ARGV[0];
 #my @indexFIle = "www/index.html";
 
@@ -29,7 +28,7 @@ sub customReadDirectory{
 if(not defined $directory){
   die("## Error - Directory not defined, add the directory and re-run the script.");
 } else{
-   my @filesndDir = customReadDirectory($directory); # contains the direcory and files 
+   my @filesndDir = customReadDirectory($directory); # contains the directory and files 
    # onlyFiles - all the files removing directories .
    my @onlyFiles = grep{$_ =~ m/\.[a-zA-Z]/ } @filesndDir ;  
    say(" ^^^^^^^^^^ The files are (@onlyFiles)");
@@ -40,19 +39,58 @@ if(not defined $directory){
    # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
     # I have to create function like repeatCustomReadDirectory only for files.
-   my @rdata = repeatReadFile(@onlyFiles);
-   say ("only files are ",@rdata);
+   my @rdata = readFile("www/index.html"); # need to change 
    push @onlyFiles,@data;
-      foreach(@onlyFiles){
-    say (" file are : $_");
+
+   foreach(@rdata){
+     # list of all used links from index.html 
+     say("used links in HTML Files need to kept as it is : $_");
    }
 
-   #makeDir("data.txt");
-  #readFile("www/craters1.html"); # works fine src and href 
-  #readFile("www/index.html");
-  #my @readData = readFile(@rdata, @data);
-  #say(@readData);1
+   foreach(@onlyFiles){
+    # list of the all the files . 
+    say (" total file in the current directory $directory: $_");
+   }
+   my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
+   foreach my $path (@missingFiles){
+    # unused links that needs to moved rubbish folder 
+    (my $basename = $path) =~ s,.*/,,;
+    say(" unused files: $path -> $basename");
+   }
 
+   my @create= makeDir(@missingFiles);
+   my @move = moveFile(@missingFiles);
+   #}
+   #makeDir("data.txt");
+   #readFile("www/craters1.html"); # works fine src and href 
+   #readFile("www/index.html");
+   #my @readData = readFile(@rdata, @data);
+   #say(@readData);1
+
+   my $val = "img/yz" ;
+   my @fields = split '/', $val;
+
+   print @fields[1];
+
+}
+
+sub getMissingFiles{
+  my (@files) =@_;
+  my $totalFiles = @files[0];
+  my $usedFiles = @files[1];
+  my @unusedFiles=();
+  # need to  write logic for unsed files by @files array and @rdata array.
+ #say("files \n", @$totalFiles);
+ #say("usedArray \n",@$usedFiles); 
+ foreach(@$totalFiles)
+{
+    my $key= $_;
+    if(!($key ~~ @$usedFiles))
+    {
+        push(@unusedFiles, $key);
+    }
+}
+return @unusedFiles;
 }
 
 # repeat array tasks for readDirectory
@@ -66,37 +104,31 @@ sub repeatCustomReadDirectory{
   return @onlyFiles;
 }
 
-#repeat array tasks for readFiles
-sub repeatReadFile{
-  my @filedir = @_;
-  my @subdir =();
-  foreach my $hfile (@filedir){
-    
-  }
-  while(my $hfile=shift(@filedir)){
-      my @hfiles = readFile($hfile);
-    say("The current links for the files \n",@hfiles);
-    push @subdir, @hfiles;
-  }
-  return @subdir;
-}
+
 # creation of directory 
 sub makeDir{
   my ($argv)= $_; # taking   input #test 
-   return `mkdir $argv`;
+  my $a = `mkdir -p "./RubbishBin"`;
+  return $a;
 }
 
 # readFile function that reads and returns src and href in an array
 sub readFile{
   my $somefile = $_[0];
-  my @links = ();
+  my @links = ($somefile);
+  #say("=====!  readFileCalled ====!!", @links);
   my $p = HTML::TokeParser->new($somefile) || die "Can't open: $!";
   # configure its behaviour
   while (my $token = $p->get_tag("img","a")){
      my $currentlink = $token->[1]{href} || $token->[1]{src};
      my $finalLink= $directory."/".$currentlink ; 
-     say(" =================> parsed links : $finalLink for the file is $somefile <==================" );
-     push @links,$finalLink;
+     if($currentlink =~ /\.html$/){
+         #say("Reading the next html File is... ",$currentlink);
+         my @data = readFile($finalLink); # recursive Function that is called 
+         push @links,@data;
+     } else{
+          push @links,$finalLink;
+     }
   }
   return @links;
 }
@@ -105,14 +137,13 @@ sub readFile{
 sub moveFile{
   my $fileName= $_[0];
   my $directoryName= $_[1];
+   foreach my $path ($fileName,$directoryName){
+    # unused links that needs to moved rubbish folder 
+    (my $basename = $path) =~ s,.*/,,;
+    say(" unused files in movfile: $path -> $basename");
+    my $b = `cp $basename  ./RubbishBin/`;
+   }
+
   #say ("moveFile", $fileName,$directoryName);
 
 }
-
- # copy("sourcefile","destinationfile") or die "Copy failed: $!";
- # copy("Copy.pm",\*STDOUT);
- # move("/dev1/sourcefile","/dev2/destinationfile");
- # use File::Copy "cp";
- # $n = FileHandle->new("/a/file","r");
-
- # cp($n,"x");
