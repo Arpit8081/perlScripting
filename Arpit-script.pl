@@ -139,7 +139,7 @@ sub moveFile{
     # unused links that needs to moved rubbish folder 
     (my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
     say(" unused files in movfile: $path -> $basename");
-    my $b = `cp $basename  ./RubbishBin/`; #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
+    my $b = `cp $basename  ./RubbishBin/`; #If I used `cp $directory/$basename  ./RubishBin`. Then only craters2.html move.
    }
 
   #say ("moveFile", $fileName,$directoryName);
