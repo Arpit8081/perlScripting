@@ -1,9 +1,7 @@
-
 use strict;
 use warnings;
 use 5.18.0;
 use HTML::TokeParser;
-#use List::Compare;
 my $directory = $ARGV[0];
 #my @indexFIle = "www/index.html";
 
@@ -29,7 +27,7 @@ sub customReadDirectory{
 if(not defined $directory){
   die("## Error - Directory not defined, add the directory and re-run the script.");
 } else{
-   my @filesndDir = customReadDirectory($directory); # contains the direcory and files 
+   my @filesndDir = customReadDirectory($directory); # contains the directory and files 
    # onlyFiles - all the files removing directories .
    my @onlyFiles = grep{$_ =~ m/\.[a-zA-Z]/ } @filesndDir ;  
    say(" ^^^^^^^^^^ The files are (@onlyFiles)");
@@ -53,11 +51,14 @@ if(not defined $directory){
     say (" total file in the current directory $directory: $_");
    }
    my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
-   foreach(@missingFiles){
+   foreach (@missingFiles){
     # unused links that needs to moved rubbish folder 
-    say(" unused files: $_ ");
+    say(" unused files: $_");
    }
 
+   my @create= makeDir(@missingFiles);
+   my @move = moveFile(@missingFiles);
+   #}
    #makeDir("data.txt");
    #readFile("www/craters1.html"); # works fine src and href 
    #readFile("www/index.html");
@@ -105,7 +106,8 @@ sub repeatCustomReadDirectory{
 # creation of directory 
 sub makeDir{
   my ($argv)= $_; # taking   input #test 
-   return `mkdir $argv`;
+  my $a = `mkdir -p "./RubbishBin"`;
+  return $a;
 }
 
 # readFile function that reads and returns src and href in an array
@@ -133,6 +135,13 @@ sub readFile{
 sub moveFile{
   my $fileName= $_[0];
   my $directoryName= $_[1];
+   foreach my $path ($fileName,$directoryName){
+    # unused links that needs to moved rubbish folder 
+    (my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
+    say(" unused files in movfile: $path -> $basename");
+    my $b = `cp $basename  ./RubbishBin/`; #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
+   }
+
   #say ("moveFile", $fileName,$directoryName);
 
 }
