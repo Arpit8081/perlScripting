@@ -3,8 +3,9 @@ use warnings;
 use 5.18.0;
 use HTML::TokeParser;
 use File::Basename;
-#no warnings 'experimental::smartmatch';
+no warnings 'experimental::smartmatch';
 my $directory = $ARGV[0];
+my $createDir = $ARGV[1];
 my @indexFiles = "$directory/index.html";
 
 # customReadDirectory {name of the directory} => or return the list of the files . 
@@ -58,15 +59,21 @@ if(not defined $directory){
     say(" unused files: $_");
    }
 
-   my @create= makeDir(@missingFiles);
-   my @move = moveFile(@missingFiles,@create);
-   #}
-   #makeDir("data.txt");
-   #readFile("www/craters1.html"); # works fine src and href 
-   #readFile("www/index.html");
-   #my @readData = readFile(@rdata, @data);
-   #say(@readData);1
-   my $total= print `find '$directory'  -printf  "%sB %p\n" | du -ch $directory/* > report.txt `;
+   if (not defined $createDir){
+  	my $createDir = `mkdir -p ./RubbishBin`;
+  	say ("Folder taking $createDir");
+  	my @move = moveFile(@missingFiles,$createDir)	
+  }
+  elsif (defined $createDir){
+  	my @createDir = `mkdir -p $createDir`;
+  	say("Folder created: @createDir");
+  	my @move = moveFile(@missingFiles,@createDir)
+  }
+
+  	# my @create= makeDir($createDir);
+  	 #say "how @create";
+  	 #my @move = moveFile(@missingFiles,@create);
+   my $total= print `stat --printf="%s\n" $directory | du -ah $directory/* > report.txt `;
 
 }
 
@@ -101,9 +108,9 @@ sub repeatCustomReadDirectory{
 
 # creation of directory 
 sub makeDir{
-  my $createDir = $ARGV[1]; # taking   input #test 
-  my $a = `mkdir -p $createDir`;
-  return $a;
+  $createDir = $_[0]; # taking   input #test 
+  my @a = ($createDir);
+  return @a;
 }
 
 # readFile function that reads and returns src and href in an array
@@ -132,14 +139,15 @@ sub moveFile{
   my $directoryName= $_[2];
   say $fileName;
   say $fileName2;
-  say $directoryName;
-   #foreach my $path ($fileName,$directoryName){
+   foreach my $path ($fileName2,$fileName){
     # unused links that needs to moved rubbish folder 
-    #(my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
-    #say(" unused files in movfile: $path -> $basename");
-    #my $b = `cp -r $path  `; #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
-  #}
-
+    (my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
+    say(" unused files in movfile: $path -> $basename"); #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
+  	say ("path is $path");
+  	#say ("driction name: $directoryName");
+  	#my $b = `cp -r $path  $directoryName`;
+  }
+  
   #say ("moveFile", $fileName,$directoryName);
 
 }
