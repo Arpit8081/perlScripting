@@ -3,7 +3,7 @@ use warnings;
 use 5.18.0;
 use HTML::TokeParser;
 use File::Basename;
-no warnings 'experimental::smartmatch';
+#no warnings 'experimental::smartmatch';
 my $directory = $ARGV[0];
 my @indexFiles = "$directory/index.html";
 
@@ -59,7 +59,7 @@ if(not defined $directory){
    }
 
    my @create= makeDir(@missingFiles);
-   my @move = moveFile(@missingFiles);
+   my @move = moveFile(@missingFiles,@create);
    #}
    #makeDir("data.txt");
    #readFile("www/craters1.html"); # works fine src and href 
@@ -101,8 +101,8 @@ sub repeatCustomReadDirectory{
 
 # creation of directory 
 sub makeDir{
-  my ($argv)= $_; # taking   input #test 
-  my $a = `mkdir -p "./RubbishBin"`;
+  my $createDir = $ARGV[1]; # taking   input #test 
+  my $a = `mkdir -p $createDir`;
   return $a;
 }
 
@@ -128,13 +128,17 @@ sub readFile{
 
 sub moveFile{
   my $fileName= $_[0];
-  my $directoryName= $_[1];
-   foreach my $path ($fileName,$directoryName){
+  my $fileName2= $_[1];
+  my $directoryName= $_[2];
+  say $fileName;
+  say $fileName2;
+  say $directoryName;
+   #foreach my $path ($fileName,$directoryName){
     # unused links that needs to moved rubbish folder 
     #(my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
     #say(" unused files in movfile: $path -> $basename");
-    my $b = `cp -r $path  ./RubbishBin/`; #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
-  }
+    #my $b = `cp -r $path  `; #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
+  #}
 
   #say ("moveFile", $fileName,$directoryName);
 
