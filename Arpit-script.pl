@@ -68,8 +68,8 @@ if(not defined $directory){
   if (defined $createDir){
     my $createdDir = `mkdir -p $createDir/$directory`;
     say("Folder created: $createDir");
-    my $w = `cp -r ./@missingFiles: $createDir/$directory`;
-    my $total= print `stat --printf="-l \n" $createDir | du -acb $createDir/* > report.txt `;
+    my $w = `cp -r ./@missingFiles $createDir/$directory`;
+    my $total= print `du -acb $createDir/* > report.txt `;
     #my @move = moveFile(@missingFiles,@createDir)
   }
 
