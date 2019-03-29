@@ -60,20 +60,23 @@ if(not defined $directory){
    }
 
    if (not defined $createDir){
-  	my $createDir = `mkdir -p ./RubbishBin`;
-  	say ("Folder taking $createDir");
-  	my @move = moveFile(@missingFiles,$createDir)	
+    my $takingDir= "RubbishBin/$directory";
+    my $createDir = `mkdir -vp $@ "$takingDir" && cp @missingFiles "$takingDir"`; 
+    say ("By Default Folder taking: RubbishBin");
+    my $total= print `stat --printf="%s\n" $takingDir | du -acb $takingDir/* > report.txt `;
   }
-  elsif (defined $createDir){
-  	my @createDir = `mkdir -p $createDir`;
-  	say("Folder created: @createDir");
-  	my @move = moveFile(@missingFiles,@createDir)
+  if (defined $createDir){
+    my $createdDir = `mkdir -p $createDir/$directory`;
+    say("Folder created: $createDir");
+    my $w = `cp -r ./@missingFiles: $createDir/$directory`;
+    my $total= print `stat --printf="-l \n" $createDir | du -acb $createDir/* > report.txt `;
+    #my @move = moveFile(@missingFiles,@createDir)
   }
 
-  	# my @create= makeDir($createDir);
-  	 #say "how @create";
-  	 #my @move = moveFile(@missingFiles,@create);
-   my $total= print `stat --printf="%s\n" $directory | du -ah $directory/* > report.txt `;
+    # my @create= makeDir($createDir);
+     #say "how @create";
+     #my @move = moveFile(@missingFiles,@create);
+    #my $total= print `stat --printf="%s\n" $directory | du -ah $directory/* > report.txt `;
 
 }
 
@@ -134,20 +137,19 @@ sub readFile{
 
 
 sub moveFile{
-  my $fileName= $_[0];
-  my $fileName2= $_[1];
+  my $fileName= $_;
+  my $fileName2= $_;
   my $directoryName= $_[2];
   say $fileName;
   say $fileName2;
-   foreach my $path ($fileName2,$fileName){
+  my $path;
+   foreach $path ($fileName,$fileName2){
     # unused links that needs to moved rubbish folder 
     (my $basename = $path) =~ s,.*/,,; #split comand used for geting last name.
     say(" unused files in movfile: $path -> $basename"); #If I used `cp $directory/$basename  ./RubishBin`. Then they only move craters2.html.
-  	say ("path is $path");
-  	#say ("driction name: $directoryName");
-  	#my $b = `cp -r $path  $directoryName`;
+    say ("path is $path");
+    my $b = `cp -r $path $directoryName`;
+    #say ("driction name: $directoryName");
   }
-  
   #say ("moveFile", $fileName,$directoryName);
-
 }
