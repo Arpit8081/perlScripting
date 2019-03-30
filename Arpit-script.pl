@@ -1,3 +1,4 @@
+#using libraries. 
 use strict;
 use warnings;
 use 5.18.0;
@@ -6,6 +7,7 @@ use File::Basename;
 no warnings 'experimental::smartmatch';
 my $directory = $ARGV[0];
 my $createDir = $ARGV[1];
+#by Defalut select file name.
 my $filename ="report.txt";
 
 # customReadDirectory {name of the directory} => or return the list of the files . 
@@ -42,7 +44,7 @@ if(not defined $directory){
 # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
 # Now read all the file and Parsh the file and find the link of the files.  
-   my @rdata = readFile("@indexFiles"); # need to change 
+   my @rdata = readFile("@indexFiles");
    push @onlyFiles,@data; #push the files.
 
    foreach(@rdata){
@@ -64,14 +66,41 @@ if(not defined $directory){
     my @create= makingDir($createDir);
     my $c = `cp -r ./@missingFiles @create`;
     say ("Files moved to: @create");
-    my $total= print `du -acb @create/* > $filename `;
-    say $total;
+# This function open the file name.
+    open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
+    print $fh "Cleanup staistics for $directory:\n \n";
+#This part check the how many GIF file is available.
+    my $gif_nums = `ls @create/*.gif | grep -v ^1 |wc -l`;
+#This part check the GIF file size. 
+    my $gif_sizes = `stat --printf="%s" @create/*.gif `;
+#This part check the how many HTML file is available. 
+    my $html_nums = `ls @create/*.html | grep -v ^1 |wc -l`;
+#This part check the HTML file size. 
+    my $html_sizes = `stat --printf="%s" @create/*.html `;
+#Total of files and size.
+    my $total_nums = $gif_nums + $html_nums;
+    my $total_sizes = $gif_sizes + $html_sizes;
+    print $fh "GIF files: $gif_nums file(s) $gif_sizes bytes\n";
+    print $fh "HTML files: $html_nums file(s) $html_sizes bytes\n";
+    print $fh "Total: $total_nums file(s) $total_sizes bytes\n";
+    close $fh;
   }
   if (defined $createDir){
     my @created= makeDir($createDir);
     my $w = `cp -r ./@missingFiles @created`;
     say ("Files moved to: @created");
-    my $total= print `du -acb @created/* > $filename `;
+    open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
+    print $fh "Cleanup staistics for $directory:\n \n";
+    my $gif_nums = `ls @created/*.gif | grep -v ^1 |wc -l`;
+    my $gif_sizes = `stat --printf="%s" @created/*.gif `;
+    my $html_nums = `ls @created/*.html | grep -v ^1 |wc -l`;
+    my $html_sizes = `stat --printf="%s" @created/*.html `;
+    my $total_nums = $gif_nums + $html_nums;
+    my $total_sizes = $gif_sizes + $html_sizes;
+    print $fh "GIF files: $gif_nums file(s) $gif_sizes bytes\n";
+    print $fh "HTML files: $html_nums file(s) $html_sizes bytes\n";
+    print $fh "Total: $total_nums file(s) $total_sizes bytes\n";
+    close $fh;
   }
 }
 
