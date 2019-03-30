@@ -4,7 +4,10 @@ use 5.18.0;
 use HTML::TokeParser;
 use File::Copy;
 use List::Compare;
+use File::Basename;
 my $directory = $ARGV[0];
+my $changeDir = $directory."-after";
+my $rubbishBin = $ARGV[1];
 #my @indexFIle = "www/index.html";
 
 # customReadDirectory {name of the directory} => or return the list of the files . 
@@ -36,26 +39,49 @@ if(not defined $directory){
 
    # only directories that is downloads and Images.  
    my @subdiretory = grep{$_ !~ m/\.[a-zA-Z]/ } @filesndDir;
-   say("The sub directory  are (@subdiretory)");
+   say("The sub directory  are @subdiretory");
+   
+    # creating the directory and making the changes accordiing to it . 
+    makeDir($changeDir);
+    makeDir($rubbishBin);
+    renamingCurrentDirWithAfter(@subdiretory);
+    #---------------------------------------------------------#
    # now iterating each subdirectory and  push into an subdiretory array .
    my @data = repeatCustomReadDirectory(@subdiretory);
+
     # I have to create function like repeatCustomReadDirectory only for files.
    my @rdata = readFile("www/index.html"); # need to change 
    push @onlyFiles,@data;
-
-   foreach(@rdata){
+   my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
+  
+   foreach my $usefulLinks (@rdata){
      # list of all used links from index.html 
-     say("used links in HTML Files need to kept as it is : $_");
+     say("used links in HTML Files need to kept as it is : $usefulLinks");
+     my $saveOldusefulLinks = $usefulLinks;
+     if($usefulLinks =~ s/^www/www-after/g){
+         say($usefulLinks);
+          my $dirName = dirname($usefulLinks);
+         `mv $saveOldusefulLinks  $dirName`;
+         say(" $saveOldusefulLinks  $dirName");
+     }
    }
 
    foreach(@onlyFiles){
     # list of the all the files . 
     say (" total file in the current directory $directory: $_");
    }
-   my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
-   foreach(@missingFiles){
+   
+   foreach my $missingFile (@missingFiles){
     # unused links that needs to moved rubbish folder 
-    say(" unused files: $_ ");
+    my $dirName = $rubbishBin.'/'.$directory;
+    my $currentFilePath = $missingFile;
+    say(" unused files: $missingFile");
+    if($missingFile =~ s/^$directory/$dirName/g){
+         say($missingFile);
+          my $dirName = dirname($missingFile);
+         `mv $directory  $rubbishBin`;
+         say(" $currentFilePath  $dirName");
+     }
    }
 
    #makeDir("data.txt");
@@ -64,24 +90,38 @@ if(not defined $directory){
    #my @readData = readFile(@rdata, @data);
    #say(@readData);1
 
-   my $val = "img/yz" ;
-   my @fields = split '/', $val;
+   
 
-   print @fields[1];
+}
 
+sub renamingCurrentDirWithAfter{
+  my @dir = @_;
+  foreach my $currentDir (@dir){
+    say($currentDir,"before");
+    if($currentDir =~ s/^www/www-after/g){
+      say($currentDir);
+      makeDir($currentDir);
+    }
+  }
 }
 
 sub getMissingFiles{
   my (@files) =@_;
-  my $totalFiles = @files[0];
-  my $usedFiles = @files[1];
+  my $totalFiles = $files[0];
+  my $usedFiles = $files[1];
+  say("ddfvdfdf",$totalFiles,$usedFiles);
   my @unusedFiles=();
-  # need to  write logic for unsed files by @files array and @rdata array.
- #say("files", @$totalFiles);
- #say("usedArray",@$usedFiles); 
-
-  my $diff = List::Compare->new( $totalFiles, $usedFiles );
-  return $diff->get_Lonly;
+# write logic for unsed files by @files array and @rdata array.
+ foreach(@$totalFiles)
+{
+    my $key= $_;
+    if(!($key ~~ @$usedFiles))
+    {
+        say("$key   @$usedFiles ");
+        push(@unusedFiles, $key);
+    }
+}
+return @unusedFiles;
 }
 
 # repeat array tasks for readDirectory
@@ -98,8 +138,9 @@ sub repeatCustomReadDirectory{
 
 # creation of directory 
 sub makeDir{
-  my ($argv)= $_; # taking   input #test 
-   return `mkdir $argv`;
+  my @argv= @_; # taking   input #test 
+  say(@argv, "called");
+   `mkdir @argv`;
 }
 
 # readFile function that reads and returns src and href in an array
@@ -127,6 +168,7 @@ sub readFile{
 sub moveFile{
   my $fileName= $_[0];
   my $directoryName= $_[1];
+
   #say ("moveFile", $fileName,$directoryName);
 
 }
