@@ -3,12 +3,11 @@ use warnings;
 use 5.18.0;
 use HTML::TokeParser;
 use File::Copy;
-use List::Compare;
 use File::Basename;
 my $directory = $ARGV[0];
 my $changeDir = $directory."-after";
 my $rubbishBin = $ARGV[1];
-#my @indexFIle = "www/index.html";
+my $indexFIle = $directory."/"."index.html";
 
 # customReadDirectory {name of the directory} => or return the list of the files . 
 sub customReadDirectory{
@@ -50,7 +49,7 @@ if(not defined $directory){
    my @data = repeatCustomReadDirectory(@subdiretory);
 
     # I have to create function like repeatCustomReadDirectory only for files.
-   my @rdata = readFile("www/index.html"); # need to change 
+   my @rdata = readFile($indexFIle); # need to change 
    push @onlyFiles,@data;
    my @missingFiles = getMissingFiles(\@onlyFiles,\@rdata);
   
@@ -58,11 +57,9 @@ if(not defined $directory){
      # list of all used links from index.html 
      say("used links in HTML Files need to kept as it is : $usefulLinks");
      my $saveOldusefulLinks = $usefulLinks;
-     if($usefulLinks =~ s/^www/www-after/g){
-         say($usefulLinks);
+     if($usefulLinks =~ s/^$directory/$changeDir/g){
           my $dirName = dirname($usefulLinks);
          `mv $saveOldusefulLinks  $dirName`;
-         say(" $saveOldusefulLinks  $dirName");
      }
    }
 
@@ -77,10 +74,8 @@ if(not defined $directory){
     my $currentFilePath = $missingFile;
     say(" unused files: $missingFile");
     if($missingFile =~ s/^$directory/$dirName/g){
-         say($missingFile);
           my $dirName = dirname($missingFile);
          `mv $directory  $rubbishBin`;
-         say(" $currentFilePath  $dirName");
      }
    }
 
@@ -98,7 +93,7 @@ sub renamingCurrentDirWithAfter{
   my @dir = @_;
   foreach my $currentDir (@dir){
     say($currentDir,"before");
-    if($currentDir =~ s/^www/www-after/g){
+    if($currentDir =~ s/^$directory/$changeDir/g){
       say($currentDir);
       makeDir($currentDir);
     }
@@ -109,15 +104,12 @@ sub getMissingFiles{
   my (@files) =@_;
   my $totalFiles = $files[0];
   my $usedFiles = $files[1];
-  say("ddfvdfdf",$totalFiles,$usedFiles);
   my @unusedFiles=();
 # write logic for unsed files by @files array and @rdata array.
  foreach(@$totalFiles)
 {
     my $key= $_;
-    if(!($key ~~ @$usedFiles))
-    {
-        say("$key   @$usedFiles ");
+    if(!($key ~~ @$usedFiles)){
         push(@unusedFiles, $key);
     }
 }
@@ -139,7 +131,6 @@ sub repeatCustomReadDirectory{
 # creation of directory 
 sub makeDir{
   my @argv= @_; # taking   input #test 
-  say(@argv, "called");
    `mkdir @argv`;
 }
 
@@ -164,19 +155,3 @@ sub readFile{
   return @links;
 }
 
-
-sub moveFile{
-  my $fileName= $_[0];
-  my $directoryName= $_[1];
-
-  #say ("moveFile", $fileName,$directoryName);
-
-}
-
- # copy("sourcefile","destinationfile") or die "Copy failed: $!";
- # copy("Copy.pm",\*STDOUT);
- # move("/dev1/sourcefile","/dev2/destinationfile");
- # use File::Copy "cp";
- # $n = FileHandle->new("/a/file","r");
-
- # cp($n,"x");
