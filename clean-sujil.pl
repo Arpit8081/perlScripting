@@ -70,22 +70,11 @@ if(not defined $directory){
    
    foreach my $missingFile (@missingFiles){
     # unused links that needs to moved rubbish folder 
-    my $dirName = $rubbishBin.'/'.$directory;
-    my $currentFilePath = $missingFile;
-    say(" unused files: $missingFile");
-    if($missingFile =~ s/^$directory/$dirName/g){
-          my $dirName = dirname($missingFile);
-         `mv $directory  $rubbishBin`;
-     }
+      say("$missingFile");
    }
 
-   #makeDir("data.txt");
-   #readFile("www/craters1.html"); # works fine src and href 
-   #readFile("www/index.html");
-   #my @readData = readFile(@rdata, @data);
-   #say(@readData);1
-
-   
+   `mv $directory  $rubbishBin`
+ 
 
 }
 
